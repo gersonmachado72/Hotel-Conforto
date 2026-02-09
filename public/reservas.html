@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas - Hotel Conforto</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Customizado -->
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .header-reserva {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/img/hotel-exterior.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .quarto-card {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .quarto-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .quarto-card.selected {
+            border: 3px solid #0d6efd;
+            background-color: #f0f8ff;
+        }
+
+        .quarto-img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .quarto-info {
+            padding: 20px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background-color: #dee2e6;
+            z-index: 1;
+        }
+
+        .step {
+            text-align: center;
+            z-index: 2;
+            position: relative;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: #dee2e6;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .step.active .step-number {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .step-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .resumo-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .resumo-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .resumo-total {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .status-disponivel {
+            background-color: #28a745;
+        }
+
+        .status-reservado {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .status-ocupado {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="/img/logo.png" alt="Hotel Conforto Logo" height="40" class="me-2">
+                <span class="align-middle">Hotel Conforto</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/quartos">Quartos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#servicos">Serviços</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/reservas">Reservas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/painel">Painel</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header da página de reservas -->
+    <header class="header-reserva">
+        <div class="container">
+            <h1 class="display-4 mb-3">Faça sua Reserva</h1>
+            <p class="lead mb-0">Preencha o formulário abaixo para garantir sua estadia conosco</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Indicador de passos -->
+        <div class="step-indicator">
+            <div class="step active" id="step1-indicator">
+                <div class="step-number">1</div>
+                <div class="step-label">Escolha o Quarto</div>
+            </div>
+            <div class="step" id="step2-indicator">
+                <div class="step-number">2</div>
+                <div class="step-label">Datas</div>
+            </div>
+            <div class="step" id="step3-indicator">
+                <div class="step-number">3</div>
+                <div class="step-label">Dados</div>
+            </div>
+            <div class="step" id="step4-indicator">
+                <div class="step-number">4</div>
+                <div class="step-label">Confirmação</div>
+            </div>
+        </div>
+
+        <!-- Passo 1: Escolha do Quarto -->
+        <div class="step-content active" id="step1-content">
+            <h2 class="mb-4">Selecione seu Quarto</h2>
+            <p class="text-muted mb-4">Clique em um quarto para selecioná-lo</p>
+            
+            <div id="quartos-container" class="row">
+                <!-- Quartos serão carregados aqui via JavaScript -->
+                <div class="col-12">
+                    <div class="loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                        <p class="mt-3">Carregando quartos disponíveis...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-primary btn-lg" onclick="avancarParaPasso2()">
+                    Próximo <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Passo 2: Datas -->
+        <div class="step-content" id="step2-content">
+            <h2 class="mb-4">Datas da Estadia</h2>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="checkin" class="form-label">Data de Check-in</label>
+                    <input type="date" class="form-control form-control-lg" id="checkin" required>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="checkout" class="form-label">Data de Check-out</label>
+                    <input type="date" class="form-control form-control-lg" id="checkout" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="hospedes" class="form-label">Número de Hóspedes</label>
+                    <select class="form-select form-control-lg" id="hospedes">
+                        <option value="1">1 pessoa</option>
+                        <option value="2" selected>2 pessoas</option>
+                        <option value="3">3 pessoas</option>
+                        <option value="4">4 pessoas</option>
+                        <option value="5">5 pessoas</option>
+                        <option value="6">6 pessoas</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="criancas" class="form-label">Crianças (até 12 anos)</label>
+                    <select class="form-select form-control-lg" id="criancas">
+                        <option value="0" selected>Nenhuma</option>
+                        <option value="1">1 criança</option>
+                        <option value="2">2 crianças</option>
+                        <option value="3">3 crianças</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Resumo -->
+            <div class="resumo-box">
+                <h5 class="mb-3">Resumo da Reserva</h5>
+                <div class="resumo-item">
+                    <span>Quarto selecionado:</span>
+                    <span id="resumo-quarto">-</span>
+                </div>
+                <div class="resumo-item">
+                    <span>Diária:</span>
+                    <span id="resumo-diaria">R$ 0,00</span>
+                </div>
+                <div class="resumo-item">
+                    <span>Noites:</span>
+                    <span id="resumo-noites">0</span>
+                </div>
+                <div class="resumo-item">
+                    <span>Total estimado:</span>
+                    <span class="resumo-total" id="resumo-total">R$ 0,00</span>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <button class="btn btn-outline-secondary btn-lg" onclick="voltarParaPasso1()">
+                    <i class="fas fa-arrow-left me-2"></i> Voltar
+                </button>
+                <button class="btn btn-primary btn-lg" onclick="avancarParaPasso3()">
+                    Próximo <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Passo 3: Dados Pessoais -->
+        <div class="step-content" id="step3-content">
+            <h2 class="mb-4">Dados Pessoais</h2>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="nome" class="form-label">Nome Completo</label>
+                    <input type="text" class="form-control form-control-lg" id="nome" required>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input type="email" class="form-control form-control-lg" id="email" required>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="telefone" class="form-label">Telefone</label>
+                    <input type="tel" class="form-control form-control-lg" id="telefone" required>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="cpf" class="form-label">CPF</label>
+                    <input type="text" class="form-control form-control-lg" id="cpf" placeholder="000.000.000-00" required>
+                </div>
+            </div>
+            
+            <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="receber-ofertas">
+                <label class="form-check-label" for="receber-ofertas">
+                    Desejo receber ofertas e promoções por e-mail
+                </label>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <button class="btn btn-outline-secondary btn-lg" onclick="voltarParaPasso2()">
+                    <i class="fas fa-arrow-left me-2"></i> Voltar
+                </button>
+                <button class="btn btn-primary btn-lg" onclick="avancarParaPasso4()">
+                    Próximo <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Passo 4: Confirmação -->
+        <div class="step-content" id="step4-content">
+            <h2 class="mb-4">Confirmação da Reserva</h2>
+            
+            <div class="alert alert-info">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle fa-2x me-3"></i>
+                    <div>
+                        <h5 class="mb-0">Revise os dados da sua reserva</h5>
+                        <p class="mb-0">Confira todas as informações antes de confirmar</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Detalhes da Reserva</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Quarto:</strong> <span id="confirm-quarto">-</span></p>
+                            <p><strong>Check-in:</strong> <span id="confirm-checkin">-</span></p>
+                            <p><strong>Check-out:</strong> <span id="confirm-checkout">-</span></p>
+                            <p><strong>Hóspedes:</strong> <span id="confirm-hospedes">-</span></p>
+                            <p><strong>Valor Total:</strong> <span class="h5 text-primary" id="confirm-total">R$ 0,00</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Dados Pessoais</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Nome:</strong> <span id="confirm-nome">-</span></p>
+                            <p><strong>E-mail:</strong> <span id="confirm-email">-</span></p>
+                            <p><strong>Telefone:</strong> <span id="confirm-telefone">-</span></p>
+                            <p><strong>CPF:</strong> <span id="confirm-cpf">-</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group mb-4">
+                <label for="observacoes" class="form-label">
+                    <i class="fas fa-sticky-note me-2"></i>Observações (opcional)
+                </label>
+                <textarea class="form-control" id="observacoes" rows="3" placeholder="Alguma observação especial?"></textarea>
+            </div>
+            
+            <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="termos" required>
+                <label class="form-check-label" for="termos">
+                    Concordo com os <a href="#" target="_blank">termos e condições</a> e 
+                    <a href="#" target="_blank">política de cancelamento</a>
+                </label>
+                <div class="invalid-feedback">
+                    Você deve aceitar os termos e condições para continuar.
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <button class="btn btn-outline-secondary btn-lg" onclick="voltarParaPasso3()">
+                    <i class="fas fa-arrow-left me-2"></i> Voltar
+                </button>
+                <button class="btn btn-success btn-lg" onclick="finalizarReserva()" id="btn-confirmar">
+                    <i class="fas fa-check me-2"></i> Confirmar Reserva
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-hotel"></i> Hotel Conforto</h5>
+                    <p>Sistema de reservas com API Node.js + MySQL</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p>&copy; 2024 Hotel Conforto. Todos os direitos reservados.</p>
+                    <p>Projeto com API REST - Desenvolvimento Full Stack</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- JavaScript para o formulário de reservas -->
+    <script>
+        // Dados da reserva
+        let reserva = {
+            quarto: null,
+            quarto_id: null,
+            quarto_numero: null,
+            quarto_tipo: null,
+            precoDiaria: 0,
+            checkin: '',
+            checkout: '',
+            hospedes: 2,
+            criancas: 0,
+            nome: '',
+            email: '',
+            telefone: '',
+            cpf: '',
+            valorTotal: 0
+        };
+
+        // Função para obter imagem do quarto
+        function getRoomImage(tipo) {
+            const images = {
+                'standard': '/img/quartos/standard1.jpg',
+                'deluxe': '/img/quartos/deluxe1.jpg',
+                'suite': '/img/quartos/suite1.jpg',
+                'familia': '/img/quartos/familia.jpg'
+            };
+            return images[tipo] || '/img/quartos/standard1.jpg';
+        }
+
+        // Função para carregar quartos disponíveis da API
+        async function loadQuartosDisponiveis() {
+            try {
+                console.log('Carregando quartos disponíveis...');
+                const response = await fetch('/api/quartos');
+                const quartos = await response.json();
+                
+                const container = document.getElementById('quartos-container');
+                container.innerHTML = '';
+                
+                console.log('Quartos recebidos:', quartos);
+                
+                // Filtra quartos disponíveis
+                const quartosDisponiveis = quartos.filter(q => 
+                    q.status && q.status.toLowerCase() === 'disponivel'
+                );
+                
+                console.log('Quartos disponíveis:', quartosDisponiveis);
+                
+                if (quartosDisponiveis.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-bed fa-3x text-muted mb-3"></i>
+                            <h4>Nenhum quarto disponível no momento</h4>
+                            <p class="text-muted">Todos os nossos quartos estão reservados ou ocupados.</p>
+                            <button class="btn btn-primary mt-3" onclick="location.reload()">
+                                <i class="fas fa-redo me-2"></i> Tentar Novamente
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Cria cards para cada quarto
+                quartosDisponiveis.forEach(quarto => {
+                    const image = getRoomImage(quarto.tipo);
+                    const statusClass = quarto.status === 'disponivel' ? 'status-disponivel' : 
+                                      quarto.status === 'reservado' ? 'status-reservado' : 'status-ocupado';
+                    
+                    const card = document.createElement('div');
+                    card.className = 'col-md-6';
+                    card.innerHTML = `
+                        <div class="quarto-card" data-quarto-id="${quarto.id}" onclick="selecionarQuarto(${quarto.id}, '${quarto.numero}', '${quarto.tipo}', ${quarto.preco_noite})">
+                            <div class="position-relative">
+                                <img src="${image}" class="quarto-img" alt="Quarto ${quarto.numero}" 
+                                     onerror="this.src='/img/quartos/standard1.jpg'">
+                                <span class="status-badge ${statusClass}">${quarto.status}</span>
+                            </div>
+                            <div class="quarto-info">
+                                <h4>Quarto ${quarto.numero} - ${quarto.tipo}</h4>
+                                <p class="text-muted">${quarto.descricao || 'Quarto confortável e bem equipado.'}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div>
+                                        <i class="fas fa-users text-muted me-1"></i>
+                                        <span>${quarto.capacidade} pessoas</span>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="h5 text-primary mb-0">
+                                            R$ ${parseFloat(quarto.preco_noite).toFixed(2).replace('.', ',')}
+                                        </div>
+                                        <small class="text-muted">por noite</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+                
+                // Verifica se veio com quarto pre-selecionado na URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const quartoParam = urlParams.get('quarto');
+                
+                if (quartoParam) {
+                    // Procura o quarto pelo ID ou número
+                    const quartoSelecionado = quartosDisponiveis.find(q => 
+                        q.id == quartoParam || q.numero == quartoParam
+                    );
+                    
+                    if (quartoSelecionado) {
+                        console.log('Quarto pré-selecionado encontrado:', quartoSelecionado);
+                        // Seleciona automaticamente
+                        selecionarQuarto(quartoSelecionado.id, quartoSelecionado.numero, quartoSelecionado.tipo, quartoSelecionado.preco_noite);
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar quartos:', error);
+                document.getElementById('quartos-container').innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                        <h4>Erro ao carregar quartos</h4>
+                        <p class="text-muted">${error.message}</p>
+                        <button class="btn btn-primary mt-3" onclick="loadQuartosDisponiveis()">
+                            <i class="fas fa-redo me-2"></i> Tentar Novamente
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Função para selecionar quarto
+        function selecionarQuarto(quartoId, quartoNumero, quartoTipo, precoNoite) {
+            console.log('Selecionando quarto:', { quartoId, quartoNumero, quartoTipo, precoNoite });
+            
+            // Remove seleção anterior
+            document.querySelectorAll('.quarto-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Adiciona seleção atual
+            const selectedCard = document.querySelector(`[data-quarto-id="${quartoId}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+            
+            // Atualiza dados da reserva
+            reserva.quarto_id = quartoId;
+            reserva.quarto_numero = quartoNumero;
+            reserva.quarto_tipo = quartoTipo;
+            reserva.quarto = `Quarto ${quartoNumero} - ${quartoTipo}`;
+            reserva.precoDiaria = parseFloat(precoNoite);
+            
+            // Atualiza resumo
+            document.getElementById('resumo-quarto').textContent = reserva.quarto;
+            document.getElementById('resumo-diaria').textContent = 
+                `R$ ${reserva.precoDiaria.toFixed(2).replace('.', ',')}`;
+            document.getElementById('confirm-quarto').textContent = reserva.quarto;
+            
+            console.log('Reserva atualizada:', reserva);
+            
+            // Recalcula total se já tiver datas
+            calcularTotal();
+        }
+
+        // Função para calcular o total
+        function calcularTotal() {
+            const checkin = document.getElementById('checkin').value;
+            const checkout = document.getElementById('checkout').value;
+            
+            console.log('Calculando total:', { checkin, checkout, precoDiaria: reserva.precoDiaria });
+            
+            if (checkin && checkout && reserva.precoDiaria > 0) {
+                const inicio = new Date(checkin);
+                const fim = new Date(checkout);
+                const diffTime = Math.abs(fim - inicio);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                console.log('Dias calculados:', diffDays);
+                
+                if (diffDays > 0) {
+                    const total = diffDays * reserva.precoDiaria;
+                    reserva.valorTotal = total;
+                    
+                    document.getElementById('resumo-noites').textContent = diffDays;
+                    document.getElementById('resumo-total').textContent = 
+                        `R$ ${total.toFixed(2).replace('.', ',')}`;
+                    document.getElementById('confirm-total').textContent = 
+                        `R$ ${total.toFixed(2).replace('.', ',')}`;
+                    
+                    // Atualiza datas de confirmação
+                    document.getElementById('confirm-checkin').textContent = 
+                        inicio.toLocaleDateString('pt-BR');
+                    document.getElementById('confirm-checkout').textContent = 
+                        fim.toLocaleDateString('pt-BR');
+                }
+            }
+        }
+
+        // Funções de navegação entre passos
+        function avancarParaPasso2() {
+            if (!reserva.quarto_id) {
+                alert('Por favor, selecione um quarto antes de continuar.');
+                return;
+            }
+            
+            console.log('Avançando para passo 2. Quarto selecionado:', reserva.quarto);
+            mostrarPasso(2);
+        }
+
+        function avancarParaPasso3() {
+            const checkin = document.getElementById('checkin').value;
+            const checkout = document.getElementById('checkout').value;
+            
+            if (!checkin || !checkout) {
+                alert('Por favor, preencha as datas de check-in e check-out.');
+                return;
+            }
+            
+            if (new Date(checkout) <= new Date(checkin)) {
+                alert('A data de check-out deve ser posterior à data de check-in.');
+                return;
+            }
+            
+            reserva.checkin = checkin;
+            reserva.checkout = checkout;
+            reserva.hospedes = document.getElementById('hospedes').value;
+            reserva.criancas = document.getElementById('criancas').value;
+            
+            document.getElementById('confirm-hospedes').textContent = 
+                `${reserva.hospedes} hóspede${reserva.hospedes > 1 ? 's' : ''}` + 
+                (reserva.criancas > 0 ? `, ${reserva.criancas} criança${reserva.criancas > 1 ? 's' : ''}` : '');
+            
+            console.log('Avançando para passo 3. Datas:', { checkin, checkout });
+            mostrarPasso(3);
+        }
+
+        function avancarParaPasso4() {
+            const nome = document.getElementById('nome').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const telefone = document.getElementById('telefone').value.trim();
+            const cpf = document.getElementById('cpf').value.trim();
+            
+            if (!nome || !email || !telefone || !cpf) {
+                alert('Por favor, preencha todos os dados pessoais.');
+                return;
+            }
+            
+            // Validação básica de email
+            if (!email.includes('@') || !email.includes('.')) {
+                alert('Por favor, insira um e-mail válido.');
+                return;
+            }
+            
+            // Limpa CPF (remove pontos e traços)
+            const cpfLimpo = cpf.replace(/\D/g, '');
+            if (cpfLimpo.length !== 11) {
+                alert('Por favor, insira um CPF válido (11 dígitos).');
+                return;
+            }
+            
+            reserva.nome = nome;
+            reserva.email = email;
+            reserva.telefone = telefone;
+            reserva.cpf = cpfLimpo;
+            
+            document.getElementById('confirm-nome').textContent = nome;
+            document.getElementById('confirm-email').textContent = email;
+            document.getElementById('confirm-telefone').textContent = telefone;
+            document.getElementById('confirm-cpf').textContent = cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            
+            console.log('Avançando para passo 4. Dados pessoais preenchidos.');
+            mostrarPasso(4);
+        }
+
+        function voltarParaPasso1() {
+            mostrarPasso(1);
+        }
+
+        function voltarParaPasso2() {
+            mostrarPasso(2);
+        }
+
+        function voltarParaPasso3() {
+            mostrarPasso(3);
+        }
+
+        function mostrarPasso(numero) {
+            console.log(`Mostrando passo ${numero}`);
+            
+            // Esconde todos os passos
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active de todos os indicadores
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Mostra o passo atual
+            document.getElementById(`step${numero}-content`).classList.add('active');
+            document.getElementById(`step${numero}-indicator`).classList.add('active');
+        }
+
+        // Função para finalizar a reserva (CHAMA A API)
+        async function finalizarReserva() {
+            console.log('Finalizando reserva...');
+            
+            if (!document.getElementById('termos').checked) {
+                alert('Por favor, aceite os termos e condições para confirmar a reserva.');
+                return;
+            }
+            
+            // Desabilita o botão para evitar múltiplos cliques
+            const btnConfirmar = document.getElementById('btn-confirmar');
+            btnConfirmar.disabled = true;
+            btnConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Processando...';
+            
+            try {
+                // Prepara os dados para enviar à API
+                const dadosReserva = {
+                    quarto_id: reserva.quarto_id,
+                    hospede: {
+                        nome: reserva.nome,
+                        email: reserva.email,
+                        telefone: reserva.telefone,
+                        cpf: reserva.cpf
+                    },
+                    data_checkin: reserva.checkin,
+                    data_checkout: reserva.checkout,
+                    numero_hospedes: parseInt(reserva.hospedes),
+                    valor_total: parseFloat(reserva.valorTotal),
+                    observacoes: document.getElementById('observacoes').value.trim()
+                };
+                
+                console.log('Enviando dados para API:', dadosReserva);
+                
+                // Faz a requisição para a API
+                const response = await fetch('/api/reservas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(dadosReserva)
+                });
+                
+                const resultado = await response.json();
+                
+                console.log('Resposta da API:', resultado);
+                
+                if (!response.ok) {
+                    throw new Error(resultado.error || 'Erro ao criar reserva');
+                }
+                
+                if (resultado.success) {
+                    // Salva o código da reserva no localStorage para a página de confirmação
+                    localStorage.setItem('ultima_reserva', JSON.stringify({
+                        codigo_reserva: resultado.codigo_reserva,
+                        quarto: reserva.quarto,
+                        checkin: reserva.checkin,
+                        checkout: reserva.checkout,
+                        valor_total: reserva.valorTotal,
+                        data_criacao: new Date().toISOString()
+                    }));
+                    
+                    // Mostra mensagem de sucesso
+                    alert(`✅ Reserva confirmada com sucesso!\n\nCódigo da reserva: ${resultado.codigo_reserva}\n\nVocê será redirecionado para a página de confirmação.`);
+                    
+                    // Redireciona para a página de confirmação
+                    setTimeout(() => {
+                        window.location.href = `/reserva-confirmada.html?codigo=${resultado.codigo_reserva}`;
+                    }, 2000);
+                    
+                } else {
+                    throw new Error(resultado.message || 'Erro ao criar reserva');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao finalizar reserva:', error);
+                
+                // Reabilita o botão
+                btnConfirmar.disabled = false;
+                btnConfirmar.innerHTML = '<i class="fas fa-check me-2"></i> Confirmar Reserva';
+                
+                // Mostra mensagem de erro
+                alert(`❌ Erro ao processar reserva:\n${error.message}\n\nPor favor, tente novamente.`);
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de reservas carregada');
+            
+            // Carrega os quartos disponíveis
+            loadQuartosDisponiveis();
+            
+            // Configura datas mínimas
+            const hoje = new Date();
+            const amanha = new Date(hoje);
+            amanha.setDate(amanha.getDate() + 1);
+            
+            const hojeStr = hoje.toISOString().split('T')[0];
+            const amanhaStr = amanha.toISOString().split('T')[0];
+            
+            document.getElementById('checkin').min = hojeStr;
+            document.getElementById('checkin').value = hojeStr;
+            document.getElementById('checkout').min = amanhaStr;
+            document.getElementById('checkout').value = amanhaStr;
+            
+            // Atualiza as datas na reserva
+            reserva.checkin = hojeStr;
+            reserva.checkout = amanhaStr;
+            
+            // Adiciona listeners para cálculo automático
+            document.getElementById('checkin').addEventListener('change', function() {
+                reserva.checkin = this.value;
+                calcularTotal();
+            });
+            
+            document.getElementById('checkout').addEventListener('change', function() {
+                reserva.checkout = this.value;
+                calcularTotal();
+            });
+            
+            // Formatação do CPF
+            document.getElementById('cpf').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 11) value = value.substring(0, 11);
+                
+                if (value.length <= 11) {
+                    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                    value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                }
+                
+                e.target.value = value;
+            });
+            
+            // Formatação do telefone
+            document.getElementById('telefone').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 11) value = value.substring(0, 11);
+                
+                if (value.length > 10) {
+                    value = value.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                } else if (value.length > 6) {
+                    value = value.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+                } else if (value.length > 2) {
+                    value = value.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+                } else if (value.length > 0) {
+                    value = value.replace(/^(\d*)/, '($1');
+                }
+                
+                e.target.value = value;
+            });
+            
+            console.log('Página de reservas inicializada com sucesso');
+        });
+    </script>
+</body>
+</html>

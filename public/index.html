@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Conforto - Sistema com API</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Customizado -->
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #0d6efd !important;
+        }
+
+        /* HERO SECTION - IMAGEM DE FUNDO DO HOTEL EXTERIOR */
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('/img/hotel-exterior.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .room-card {
+            transition: transform 0.3s;
+            height: 100%;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .room-image {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar COM LOGO -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="/img/logo.png" alt="Hotel Conforto Logo" height="40" class="me-2">
+                <span class="align-middle">Hotel Conforto</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <!-- Mude para link direto para quartos.html -->
+                        <a class="nav-link" href="/quartos">Quartos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#servicos">Serviços</a>
+                    </li>
+                    <li class="nav-item">
+                        <!-- Mude para link direto para reservas.html -->
+                        <a class="nav-link" href="/reservas">Reservas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/painel">Painel</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section com imagem de fundo do hotel exterior -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="display-4 mb-4">Bem-vindo ao Hotel Conforto</h1>
+            <p class="lead mb-4">Experiência única de hospedagem com conforto, elegância e tecnologia</p>
+            <a href="#quartos" class="btn btn-primary btn-lg">Ver Quartos Disponíveis</a>
+        </div>
+    </section>
+
+    <!-- Quartos Section -->
+    <section id="quartos" class="py-5">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col text-center">
+                    <h2 class="display-5">Nossos Quartos</h2>
+                    <p class="lead">Conforto e sofisticação para sua estadia</p>
+                </div>
+            </div>
+
+            <!-- CONTAINER DOS QUARTOS -->
+            <div class="row" id="quartos-container">
+                <!-- Os quartos serão carregados dinamicamente via JavaScript -->
+                <!-- Mas aqui está um exemplo estático caso queira -->
+                <div class="col-md-4 mb-4">
+                    <div class="card room-card h-100">
+                        <!-- IMAGEM DO QUARTO STANDARD -->
+                        <img src="/img/quarto-standard1.jpg" class="card-img-top room-image" alt="Quarto Standard">
+                        <div class="card-body">
+                            <h5 class="card-title">Quarto Standard</h5>
+                            <p class="card-text">Conforto e praticidade para sua estadia, com todas as comodidades
+                                essenciais.</p>
+                            <p class="fw-bold text-primary">R$ 250,00 / noite</p>
+                            <a href="/reservas?quarto=standard" class="btn btn-primary">Reservar Agora</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card room-card h-100">
+                        <!-- IMAGEM DO QUARTO DELUXE -->
+                        <img src="/img/quarto-deluxe1.jpg" class="card-img-top room-image" alt="Quarto Deluxe">
+                        <div class="card-body">
+                            <h5 class="card-title">Quarto Deluxe</h5>
+                            <p class="card-text">Experiência premium com vista privilegiada e serviços exclusivos.</p>
+                            <p class="fw-bold text-primary">R$ 450,00 / noite</p>
+                            <a href="/reservas?quarto=deluxe" class="btn btn-primary">Reservar Agora</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Serviços Section (onde vão Piscina e Restaurante) -->
+    <section id="servicos" class="py-5 bg-light">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col text-center">
+                    <h2 class="display-5">Nossos Serviços</h2>
+                    <p class="lead">Tudo para tornar sua estadia inesquecível</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <!-- IMAGEM DO RESTAURANTE (URL do Unsplash) -->
+                        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                            class="card-img-top" alt="Restaurante Hotel Conforto"
+                            style="height: 250px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">Restaurante Premium</h5>
+                            <p class="card-text">Culinária internacional com chefs renomados e ambiente sofisticado.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <!-- IMAGEM DA PISCINA (URL do Unsplash) -->
+                        <img src="https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                            class="card-img-top" alt="Piscina Hotel Conforto" style="height: 250px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">Piscina com Vista</h5>
+                            <p class="card-text">Área de lazer com piscina aquecida e vista panorâmica da cidade.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-hotel"></i> Hotel Conforto</h5>
+                    <p>Sistema de reservas com API Node.js + MySQL</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p>&copy; 2024 Hotel Conforto. Todos os direitos reservados.</p>
+                    <p>Projeto com API REST - Desenvolvimento Full Stack</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Nosso JS -->
+    <script src="/js/main.js"></script>
+
+    <script>
+        // Debug helper
+        console.log('Página carregada - Projeto Hotel Conforto API');
+
+        // Se você quiser carregar quartos dinamicamente via API
+        // esta função deve estar no main.js
+        /*
+        async function carregarQuartos() {
+            try {
+                const response = await fetch('/api/quartos');
+                const quartos = await response.json();
+                
+                const container = document.getElementById('quartos-container');
+                container.innerHTML = '';
+                
+                quartos.forEach(quarto => {
+                    const imagem = quarto.tipo === 'standard' ? 
+                        '/img/quarto-standard.jpg' : 
+                        '/img/quarto-deluxe.jpg';
+                    
+                    const card = `
+                        <div class="col-md-4 mb-4">
+                            <div class="card room-card h-100">
+                                <img src="${imagem}" class="card-img-top room-image" alt="${quarto.nome}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${quarto.nome}</h5>
+                                    <p class="card-text">${quarto.descricao}</p>
+                                    <p class="fw-bold text-primary">R$ ${quarto.preco.toFixed(2)} / noite</p>
+                                    <a href="/reservas?quarto=${quarto.id}" class="btn btn-primary">Reservar Agora</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar quartos:', error);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', carregarQuartos);
+        */
+    </script>
+</body>
+
+</html>

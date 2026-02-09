@@ -1,0 +1,71 @@
+{
+  "reservas": [
+    {
+      "id": "a683",
+      "nome": "João Silva",
+      "email": "joao@exemplo.com",
+      "entrada": "2025-08-08",
+      "saida": "2025-08-11",
+      "adultos": "2",
+      "criancas": "1",
+      "dataReserva": "2025-08-10T18:27:37.778Z"
+    },
+
+    {
+      "id": "0e9d",
+      "nome": "Maria Dorneles",
+      "email": "maria@gmail.com",
+      "entrada": "2025-08-08",
+      "saida": "2025-08-11",
+      "adultos": "1",
+      "criancas": "0",
+      "observacoes": "",
+      "dataReserva": "2025-08-10T19:00:36.962Z"
+    },
+    {
+      "id": "7aa3",
+      "nome": "Silvia Santos",
+      "email": "silvia@gmail.com",
+      "entrada": "2025-08-08",
+      "saida": "2025-08-11",
+      "adultos": "3",
+      "criancas": "3",
+      "observacoes": "3 quartos",
+      "dataReserva": "2025-08-10T19:02:47.746Z"
+    },
+    {
+      "id": "c995",
+      "nome": "Karla Leite",
+      "email": "karla@gmail.com",
+      "entrada": "2025-08-08",
+      "saida": "2025-08-11",
+      "adultos": "1",
+      "criancas": "0",
+      "observacoes": "",
+      "dataReserva": "2025-08-10T20:41:45.168Z"
+    },
+    {
+      "id": "aa05",
+      "nome": "Cintia Ramos",
+      "email": "cintia@gmail.com",
+      "entrada": "2025-08-08",
+      "saida": "2025-08-11",
+      "adultos": "2",
+      "criancas": "0",
+      "observacoes": "",
+      "dataReserva": "2025-08-10T20:53:13.739Z"
+    },
+    {
+      "id": "5169",
+      "nome": "Pedro Soares",
+      "email": "pedro@gmail.com",
+      "entrada": "2025-08-08",
+      "saida": "2025-08-12",
+      "adultos": "2",
+      "criancas": "3",
+      "observacoes": "",
+      "dataReserva": "2025-08-10T20:54:38.124Z"
+    }
+
+  ]
+}

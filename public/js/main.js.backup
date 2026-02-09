@@ -1,0 +1,86 @@
+// Menu Mobile
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle Menu
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+    }
+    
+    // Fechar menu ao clicar em link
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            navMenu.classList.remove('active');
+        });
+    });
+    
+    // Carregar quartos
+    loadQuartos();
+});
+
+// Carregar quartos da API
+async function loadQuartos() {
+    const container = document.getElementById('quartos-container');
+    
+    try {
+        const response = await fetch('/api/quartos');
+        const quartos = await response.json();
+        
+        if (!quartos || quartos.length === 0) {
+            container.innerHTML = '<p class="no-quartos">Nenhum quarto disponível no momento.</p>';
+            return;
+        }
+        
+        container.innerHTML = quartos.map(quarto => `
+            <div class="quarto-card">
+                <div class="quarto-image">
+                    <img src="${quarto.foto_url || '/img/room-default.jpg'}" alt="Quarto ${quarto.numero}">
+                </div>
+                <div class="quarto-content">
+                    <div class="quarto-header">
+                        <h3>Quarto ${quarto.numero}</h3>
+                        <div class="quarto-tipo">${getTipoNome(quarto.tipo)}</div>
+                    </div>
+                    
+                    <div class="quarto-precio">
+                        R$ ${parseFloat(quarto.preco_noite).toFixed(2)} <span>/noite</span>
+                    </div>
+                    
+                    <p class="quarto-descricao">${quarto.descricao || 'Quarto confortável e bem equipado.'}</p>
+                    
+                    <div class="quarto-comodidades">
+                        ${quarto.comodidades && Array.isArray(quarto.comodidades) 
+                            ? quarto.comodidades.map(comodidade => 
+                                `<span class="comodidade">${comodidade}</span>`
+                              ).join('')
+                            : ''
+                        }
+                        <span class="comodidade">Capacidade: ${quarto.capacidade} pessoas</span>
+                        <span class="comodidade status-${quarto.status}">${quarto.status}</span>
+                    </div>
+                    
+                    <a href="/reservas?quarto=${quarto.id}" class="btn-quarto">
+                        <i class="fas fa-calendar-check"></i> Reservar Agora
+                    </a>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Erro ao carregar quartos:', error);
+        container.innerHTML = '<p class="error">Erro ao carregar quartos. Tente novamente mais tarde.</p>';
+    }
+}
+
+function getTipoNome(tipo) {
+    const tipos = {
+        'standard': 'Standard',
+        'deluxe': 'Deluxe',
+        'suite': 'Suíte',
+        'familia': 'Família'
+    };
+    return tipos[tipo] || tipo;
+}

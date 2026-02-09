@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nossos Quartos - Hotel Conforto</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Customizado -->
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .header-quartos {
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/img/hotel-exterior.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .room-card {
+            transition: transform 0.3s;
+            height: 100%;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .room-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .room-image {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .status-disponivel {
+            background-color: #28a745;
+        }
+
+        .status-reservado {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .status-ocupado {
+            background-color: #dc3545;
+        }
+
+        .status-manutencao {
+            background-color: #6c757d;
+        }
+
+        .amenities-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .amenities-list li {
+            padding: 4px 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .amenities-list li i {
+            color: #0d6efd;
+            margin-right: 8px;
+            width: 20px;
+        }
+
+        .price-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+
+        .filter-buttons {
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #6c757d;
+        }
+
+        /* Estilo para detalhes do quarto */
+        .quarto-detalhes-modal {
+            max-width: 800px;
+        }
+
+        .quarto-detalhes-modal .modal-body {
+            padding: 30px;
+        }
+
+        .comparacao-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparacao-table th,
+        .comparacao-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+
+        .comparacao-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .comparacao-table .check {
+            color: #28a745;
+        }
+
+        .comparacao-table .times {
+            color: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="/img/logo.png" alt="Hotel Conforto Logo" height="40" class="me-2">
+                <span class="align-middle">Hotel Conforto</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/quartos">Quartos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#servicos">Serviços</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reservas">Reservas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/painel">Painel</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="header-quartos">
+        <div class="container">
+            <h1 class="display-4 mb-4">Nossos Quartos</h1>
+            <p class="lead mb-0">Escolha o quarto perfeito para sua estadia</p>
+        </div>
+    </header>
+
+    <!-- Filtros -->
+    <div class="container mb-4">
+        <div class="filter-buttons">
+            <button class="btn btn-outline-primary filter-btn active" onclick="filterRooms('all')">
+                Todos os Quartos
+            </button>
+            <button class="btn btn-outline-primary filter-btn" onclick="filterRooms('disponivel')">
+                Disponível
+            </button>
+            <button class="btn btn-outline-primary filter-btn" onclick="filterRooms('standard')">
+                Standard
+            </button>
+            <button class="btn btn-outline-primary filter-btn" onclick="filterRooms('deluxe')">
+                Deluxe
+            </button>
+            <button class="btn btn-outline-primary filter-btn" onclick="filterRooms('suite')">
+                Suíte
+            </button>
+            <button class="btn btn-outline-primary filter-btn" onclick="filterRooms('familia')">
+                Família
+            </button>
+        </div>
+    </div>
+
+    <!-- Container dos Quartos -->
+    <main class="container">
+        <div id="rooms-container" class="row">
+            <!-- Quartos serão carregados aqui via JavaScript -->
+            <div class="col-12">
+                <div class="loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-3">Carregando quartos...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparação de Quartos -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Comparação de Tipos de Quartos</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="comparacao-table">
+                                <thead>
+                                    <tr>
+                                        <th>Característica</th>
+                                        <th>Standard</th>
+                                        <th>Deluxe</th>
+                                        <th>Suíte</th>
+                                        <th>Família</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Área (m²)</td>
+                                        <td>25-30</td>
+                                        <td>40-45</td>
+                                        <td>45-60</td>
+                                        <td>60-80</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cama</td>
+                                        <td>Queen Size</td>
+                                        <td>King Size</td>
+                                        <td>King Size + Sofá-cama</td>
+                                        <td>2 Quartos</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Vista</td>
+                                        <td>Jardim</td>
+                                        <td>Mar</td>
+                                        <td>Mar/Panorâmica</td>
+                                        <td>Jardim/Panorâmica</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Wi-Fi</td>
+                                        <td>Grátis</td>
+                                        <td>Alta velocidade</td>
+                                        <td>Premium</td>
+                                        <td>Familiar</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Hidromassagem</td>
+                                        <td class="times"><i class="fas fa-times"></i></td>
+                                        <td class="check"><i class="fas fa-check"></i></td>
+                                        <td class="check"><i class="fas fa-check"></i></td>
+                                        <td class="check"><i class="fas fa-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Serviço 24h</td>
+                                        <td class="times"><i class="fas fa-times"></i></td>
+                                        <td class="check"><i class="fas fa-check"></i></td>
+                                        <td class="check"><i class="fas fa-check"></i></td>
+                                        <td class="check"><i class="fas fa-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Café da manhã</td>
+                                        <td>Opcional</td>
+                                        <td>Incluído</td>
+                                        <td>Incluído Premium</td>
+                                        <td>Incluído Familiar</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Faixa de Preço (noite)</td>
+                                        <td>R$ 250 - R$ 280</td>
+                                        <td>R$ 450 - R$ 520</td>
+                                        <td>R$ 680 - R$ 750</td>
+                                        <td>R$ 950</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-hotel"></i> Hotel Conforto</h5>
+                    <p>Sistema de reservas com API Node.js + MySQL</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p>&copy; 2024 Hotel Conforto. Todos os direitos reservados.</p>
+                    <p>Projeto com API REST - Desenvolvimento Full Stack</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript para carregar e exibir os quartos -->
+    <script>
+        // Função para obter a imagem correta baseada no tipo do quarto
+        function getRoomImage(tipo) {
+            const images = {
+                'standard': '/img/quartos/standard1.jpg',
+                'deluxe': '/img/quartos/deluxe1.jpg',
+                'suite': '/img/quartos/suite1.jpg',
+                'familia': '/img/quartos/familia.jpg'
+            };
+            return images[tipo] || '/img/quartos/standard1.jpg';
+        }
+
+        // Função para obter ícones das comodidades baseadas no tipo
+        function getAmenities(tipo) {
+            const amenities = {
+                'standard': [
+                    { icon: 'fa-bed', text: 'Cama Queen Size' },
+                    { icon: 'fa-snowflake', text: 'Ar-condicionado' },
+                    { icon: 'fa-tv', text: 'TV a cabo 32"' },
+                    { icon: 'fa-wifi', text: 'Wi-Fi gratuito' },
+                    { icon: 'fa-shower', text: 'Banheiro privativo' },
+                    { icon: 'fa-coffee', text: 'Mesa de trabalho' }
+                ],
+                'deluxe': [
+                    { icon: 'fa-bed', text: 'Cama King Size' },
+                    { icon: 'fa-hot-tub', text: 'Banheira de hidromassagem' },
+                    { icon: 'fa-tv', text: 'TV Smart 55"' },
+                    { icon: 'fa-wifi', text: 'Wi-Fi de alta velocidade' },
+                    { icon: 'fa-umbrella-beach', text: 'Vista para o mar' },
+                    { icon: 'fa-concierge-bell', text: 'Serviço de quarto 24h' },
+                    { icon: 'fa-wine-glass-alt', text: 'Minibar reabastecido' }
+                ],
+                'suite': [
+                    { icon: 'fa-bed', text: 'Cama King Size' },
+                    { icon: 'fa-hot-tub', text: 'Hidromassagem' },
+                    { icon: 'fa-tv', text: 'TV Smart 65"' },
+                    { icon: 'fa-couch', text: 'Sala de estar' },
+                    { icon: 'fa-wifi', text: 'Wi-Fi premium' },
+                    { icon: 'fa-concierge-bell', text: 'Serviço de quarto 24h' },
+                    { icon: 'fa-utensils', text: 'Café da manhã incluso' }
+                ],
+                'familia': [
+                    { icon: 'fa-bed', text: '2 Quartos separados' },
+                    { icon: 'fa-users', text: 'Capacidade para 6 pessoas' },
+                    { icon: 'fa-tv', text: 'TVs em todos os quartos' },
+                    { icon: 'fa-utensils', text: 'Cozinha compacta' },
+                    { icon: 'fa-wifi', text: 'Wi-Fi familiar' },
+                    { icon: 'fa-child', text: 'Área kids friendly' },
+                    { icon: 'fa-car', text: 'Estacionamento incluso' }
+                ]
+            };
+            return amenities[tipo] || amenities['standard'];
+        }
+
+        // Função para obter classe CSS do status
+        function getStatusClass(status) {
+            switch(status?.toLowerCase()) {
+                case 'disponivel': return 'status-disponivel';
+                case 'reservado': return 'status-reservado';
+                case 'ocupado': return 'status-ocupado';
+                case 'manutencao': return 'status-manutencao';
+                default: return 'status-disponivel';
+            }
+        }
+
+        // Função para criar o card do quarto
+        function createRoomCard(quarto) {
+            const image = getRoomImage(quarto.tipo);
+            const amenities = getAmenities(quarto.tipo);
+            const statusClass = getStatusClass(quarto.status);
+            const statusText = quarto.status || 'Disponível';
+            
+            // Formatar preço
+            const preco = parseFloat(quarto.preco_noite || quarto.preco || 0);
+            const precoFormatado = preco.toFixed(2).replace('.', ',');
+            
+            return `
+                <div class="col-lg-4 col-md-6" data-tipo="${quarto.tipo}" data-status="${quarto.status}">
+                    <div class="card room-card h-100">
+                        <div class="position-relative">
+                            <img src="${image}" class="card-img-top room-image" alt="Quarto ${quarto.numero} - ${quarto.tipo}"
+                                 onerror="this.src='/img/quartos/standard1.jpg'">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="card-body">
+                            <h4 class="card-title">Quarto ${quarto.numero} - ${quarto.tipo}</h4>
+                            <p class="card-text text-muted">${quarto.descricao || 'Quarto confortável e bem equipado.'}</p>
+                            
+                            <div class="mb-3">
+                                <ul class="amenities-list">
+                                    ${amenities.slice(0, 3).map(amenity => `
+                                        <li><i class="fas ${amenity.icon}"></i> ${amenity.text}</li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                            
+                            <div class="row mt-3">
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-users text-muted me-2"></i>
+                                        <span>${quarto.capacidade || 2} pessoas</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <div class="price-display">
+                                        R$ ${precoFormatado}
+                                    </div>
+                                    <small class="text-muted">por noite</small>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                ${quarto.status?.toLowerCase() === 'disponivel' ? 
+                                    `<a href="/reservas?quarto=${quarto.id || quarto.numero}" class="btn btn-primary">
+                                        <i class="fas fa-calendar-check me-2"></i> Reservar Agora
+                                    </a>` :
+                                    `<button class="btn btn-outline-secondary" disabled>
+                                        <i class="fas fa-ban me-2"></i> Indisponível
+                                    </button>`
+                                }
+                                <button class="btn btn-outline-info" onclick="showRoomDetails(${JSON.stringify(quarto).replace(/"/g, '&quot;')})">
+                                    <i class="fas fa-info-circle me-2"></i> Mais Detalhes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Função para mostrar detalhes do quarto em modal
+        function showRoomDetails(quarto) {
+            const amenities = getAmenities(quarto.tipo);
+            const preco = parseFloat(quarto.preco_noite || quarto.preco || 0);
+            const precoFormatado = preco.toFixed(2).replace('.', ',');
+            const image = getRoomImage(quarto.tipo);
+            
+            const modalHTML = `
+                <div class="modal fade" id="roomDetailsModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg quarto-detalhes-modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Detalhes do Quarto ${quarto.numero} - ${quarto.tipo}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <img src="${image}" class="img-fluid rounded mb-3" 
+                                             alt="Quarto ${quarto.numero}" 
+                                             onerror="this.src='/img/quartos/standard1.jpg'">
+                                        <div class="mb-4">
+                                            <h5>Descrição</h5>
+                                            <p>${quarto.descricao || 'Quarto confortável e bem equipado para sua estadia.'}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-4">
+                                            <h5>Informações do Quarto</h5>
+                                            <ul class="list-unstyled">
+                                                <li><strong>Número:</strong> ${quarto.numero}</li>
+                                                <li><strong>Tipo:</strong> ${quarto.tipo}</li>
+                                                <li><strong>Status:</strong> ${quarto.status || 'Disponível'}</li>
+                                                <li><strong>Capacidade:</strong> ${quarto.capacidade || 2} pessoas</li>
+                                                <li><strong>Diária:</strong> R$ ${precoFormatado}</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <h5>Comodidades</h5>
+                                            <ul class="amenities-list">
+                                                ${amenities.map(amenity => `
+                                                    <li><i class="fas ${amenity.icon}"></i> ${amenity.text}</li>
+                                                `).join('')}
+                                            </ul>
+                                        </div>
+                                        
+                                        ${quarto.status?.toLowerCase() === 'disponivel' ? 
+                                            `<div class="d-grid">
+                                                <a href="/reservas?quarto=${quarto.id || quarto.numero}" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-calendar-check me-2"></i> Reservar Este Quarto
+                                                </a>
+                                            </div>` :
+                                            `<div class="alert alert-warning">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                Este quarto não está disponível para reserva no momento.
+                                            </div>`
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove modal anterior se existir
+            const existingModal = document.getElementById('roomDetailsModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Adiciona novo modal ao body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Mostra o modal
+            const modal = new bootstrap.Modal(document.getElementById('roomDetailsModal'));
+            modal.show();
+        }
+
+        // Função para filtrar quartos
+        function filterRooms(filter) {
+            // Atualiza botões ativos
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Mostra/esconde quartos
+            const rooms = document.querySelectorAll('#rooms-container .col-lg-4.col-md-6');
+            rooms.forEach(room => {
+                if (filter === 'all' || 
+                    room.getAttribute('data-tipo') === filter ||
+                    room.getAttribute('data-status') === filter) {
+                    room.style.display = 'block';
+                } else {
+                    room.style.display = 'none';
+                }
+            });
+        }
+
+        // Carregar quartos da API
+        async function loadRooms() {
+            try {
+                const response = await fetch('/api/quartos');
+                const quartos = await response.json();
+                
+                const container = document.getElementById('rooms-container');
+                container.innerHTML = '';
+                
+                if (!quartos || quartos.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-bed fa-3x text-muted mb-3"></i>
+                            <h4>Nenhum quarto disponível no momento</h4>
+                            <p class="text-muted">Tente novamente mais tarde.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Ordena quartos por número
+                quartos.sort((a, b) => parseInt(a.numero) - parseInt(b.numero));
+                
+                // Adiciona cada quarto
+                quartos.forEach(quarto => {
+                    container.innerHTML += createRoomCard(quarto);
+                });
+                
+                // Atualiza contador
+                const totalQuartos = quartos.length;
+                const quartosDisponiveis = quartos.filter(q => q.status?.toLowerCase() === 'disponivel').length;
+                
+                console.log(`Carregados ${totalQuartos} quartos (${quartosDisponiveis} disponíveis)`);
+                
+            } catch (error) {
+                console.error('Erro ao carregar quartos:', error);
+                document.getElementById('rooms-container').innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                        <h4>Erro ao carregar quartos</h4>
+                        <p class="text-muted">Não foi possível conectar ao servidor.</p>
+                        <button class="btn btn-primary mt-3" onclick="loadRooms()">
+                            <i class="fas fa-redo me-2"></i> Tentar Novamente
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Carregar quartos quando a página carregar
+        document.addEventListener('DOMContentLoaded', loadRooms);
+    </script>
+</body>
+</html>

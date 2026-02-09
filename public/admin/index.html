@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Hotel Conforto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: #3498db;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            height: fit-content;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border-left: 4px solid #3498db;
+        }
+
+        .stat-card h3 {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219653;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d68910;
+        }
+
+        .btn-logout {
+            background: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            color: #2c3e50;
+            border-bottom: 2px solid #e0e0e0;
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: middle;
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge-secondary {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid #3498db;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .table {
+                min-width: 600px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-hotel"></i>
+                <span>Hotel Conforto - Admin</span>
+            </div>
+            <div class="user-menu">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div>
+                    <div id="userName">Administrador</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Painel Administrativo</div>
+                </div>
+                <a href="#" onclick="logout()" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active" onclick="showSection('dashboard')">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a></li>
+                <li><a href="#" onclick="showSection('quartos')">
+                        <i class="fas fa-bed"></i> Quartos
+                    </a></li>
+                <li><a href="#" onclick="showSection('reservas')">
+                        <i class="fas fa-calendar-alt"></i> Reservas
+                    </a></li>
+                <li><a href="#" onclick="showSection('hospedes')">
+                        <i class="fas fa-users"></i> Hóspedes
+                    </a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <!-- DASHBOARD -->
+            <section id="dashboard-section">
+                <h2 class="section-title">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </h2>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total de Reservas</h3>
+                        <div class="stat-value" id="totalReservas">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Quartos Disponíveis</h3>
+                        <div class="stat-value" id="quartosDisponiveis">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Faturamento Mês</h3>
+                        <div class="stat-value" id="faturamentoMes">R$ 0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Taxa de Ocupação</h3>
+                        <div class="stat-value" id="taxaOcupacao">0%</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px;">Ações Rápidas</h3>
+                <div style="display: flex; gap: 15px; margin-top: 15px;">
+                    <button class="btn btn-success" onclick="liberarTodosQuartos()">
+                        <i class="fas fa-unlock"></i> Liberar Todos Quartos
+                    </button>
+                    <button class="btn btn-warning" onclick="window.location.reload()">
+                        <i class="fas fa-sync-alt"></i> Atualizar Dados
+                    </button>
+                </div>
+
+                <h3 style="margin-top: 30px;">Últimas Reservas</h3>
+                <div id="reservasRecentes">Carregando...</div>
+            </section>
+
+            <!-- QUARTOS -->
+            <section id="quartos-section" style="display: none;">
+                <h2 class="section-title">
+                    <i class="fas fa-bed"></i> Gerenciar Quartos
+                    <button class="btn btn-primary" onclick="abrirModalQuarto()">
+                        <i class="fas fa-plus"></i> Novo Quarto
+                    </button>
+                </h2>
+                <div id="quartosList">Carregando...</div>
+            </section>
+
+            <!-- RESERVAS -->
+            <section id="reservas-section" style="display: none;">
+                <h2 class="section-title">
+                    <i class="fas fa-calendar-alt"></i> Gerenciar Reservas
+                </h2>
+
+                <div class="tabs">
+                    <div class="tab active" onclick="filtrarReservas('todas')">Todas</div>
+                    <div class="tab" onclick="filtrarReservas('pendente')">Pendentes</div>
+                    <div class="tab" onclick="filtrarReservas('confirmada')">Confirmadas</div>
+                    <div class="tab" onclick="filtrarReservas('cancelada')">Canceladas</div>
+                </div>
+
+                <div id="reservasList">Carregando...</div>
+            </section>
+
+            <!-- HÓSPEDES -->
+            <section id="hospedes-section" style="display: none;">
+                <h2 class="section-title">
+                    <i class="fas fa-users"></i> Gerenciar Hóspedes
+                </h2>
+                <div id="hospedesList">Carregando...</div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL QUARTO -->
+    <div id="modalQuarto" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalQuartoTitulo">Novo Quarto</h2>
+                <button onclick="fecharModalQuarto()"
+                    style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+            <form id="formQuarto">
+                <input type="hidden" id="quartoId">
+                <div class="form-group">
+                    <label for="numero">Número do Quarto *</label>
+                    <input type="text" id="numero" required>
+                </div>
+                <div class="form-group">
+                    <label for="tipo">Tipo *</label>
+                    <select id="tipo" required>
+                        <option value="standard">Standard</option>
+                        <option value="deluxe">Deluxe</option>
+                        <option value="suite">Suíte</option>
+                        <option value="familia">Família</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="preco_noite">Preço por Noite *</label>
+                    <input type="number" id="preco_noite" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="capacidade">Capacidade *</label>
+                    <input type="number" id="capacidade" min="1" max="10" required>
+                </div>
+                <div class="form-group">
+                    <label for="descricao">Descrição</label>
+                    <textarea id="descricao" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status *</label>
+                    <select id="status" required>
+                        <option value="disponivel">Disponível</option>
+                        <option value="ocupado">Ocupado</option>
+                        <option value="reservado">Reservado</option>
+                        <option value="manutencao">Manutenção</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Salvar</button>
+                    <button type="button" class="btn" onclick="fecharModalQuarto()"
+                        style="flex: 1; background: #f8f9fa;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL RESERVA DETALHES -->
+    <div id="modalReserva" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalReservaTitulo">Detalhes da Reserva</h2>
+                <button onclick="fecharModalReserva()"
+                    style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+            <div id="reservaDetalhes">
+                Carregando...
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const token = localStorage.getItem('token');
+        let filtroReservaAtual = 'todas';
+
+        if (!token) {
+            window.location.href = '/admin/login.html';
+        }
+
+        // ========== DASHBOARD ==========
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/dashboard/stats', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401) logout();
+                const stats = await response.json();
+
+                document.getElementById('totalReservas').textContent = stats.totalReservas || 0;
+                document.getElementById('quartosDisponiveis').textContent = stats.quartosDisponiveis || 0;
+                document.getElementById('faturamentoMes').textContent = `R$ ${stats.faturamentoMes || 0}`;
+                document.getElementById('taxaOcupacao').textContent = `${stats.taxaOcupacao || 0}%`;
+
+                // Carregar reservas recentes
+                const reservasResponse = await fetch('/api/dashboard/reservas-recentes', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const reservas = await reservasResponse.json();
+
+                if (reservas && reservas.length > 0) {
+                    const reservasHTML = `
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Quarto</th>
+                                        <th>Hóspede</th>
+                                        <th>Check-in</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${reservas.slice(0, 5).map(r => `
+                                        <tr>
+                                            <td><strong>${r.codigo_reserva}</strong></td>
+                                            <td>${r.Quarto?.numero || 'N/A'}</td>
+                                            <td>${r.Hospede?.nome || 'N/A'}</td>
+                                            <td>${new Date(r.data_checkin).toLocaleDateString('pt-BR')}</td>
+                                            <td><span class="badge badge-${r.status_reserva}">${r.status_reserva}</span></td>
+                                            <td>
+                                                <button class="btn btn-primary" onclick="verDetalhesReserva(${r.id})">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    document.getElementById('reservasRecentes').innerHTML = reservasHTML;
+                } else {
+                    document.getElementById('reservasRecentes').innerHTML =
+                        '<p class="empty-state">Nenhuma reserva encontrada</p>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dashboard:', error);
+            }
+        }
+
+        // ========== QUARTOS ==========
+        async function loadQuartos() {
+            try {
+                const response = await fetch('/api/quartos', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const quartos = await response.json();
+
+                if (quartos && quartos.length > 0) {
+                    const quartosHTML = `
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Número</th>
+                                        <th>Tipo</th>
+                                        <th>Descrição</th>
+                                        <th>Preço</th>
+                                        <th>Capacidade</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${quartos.map(q => `
+                                        <tr>
+                                            <td><strong>${q.numero}</strong></td>
+                                            <td>${getTipoNome(q.tipo)}</td>
+                                            <td>${q.descricao || '-'}</td>
+                                            <td>R$ ${parseFloat(q.preco_noite).toFixed(2)}</td>
+                                            <td>${q.capacidade} pessoas</td>
+                                            <td>
+                                                <span class="badge badge-${q.status}">
+                                                    ${getStatusNome(q.status)}
+                                                </span>
+                                            </td>
+                                            <td class="action-buttons">
+                                                <button class="btn btn-primary" onclick="editarQuarto(${q.id})">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger" onclick="excluirQuarto(${q.id})">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    document.getElementById('quartosList').innerHTML = quartosHTML;
+                } else {
+                    document.getElementById('quartosList').innerHTML =
+                        '<p class="empty-state">Nenhum quarto cadastrado</p>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar quartos:', error);
+            }
+        }
+
+        // ========== RESERVAS ==========
+        async function loadReservas(filtro = 'todas') {
+            try {
+                const url = filtro === 'todas' ? '/api/reservas' : `/api/reservas?status=${filtro}`;
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                let reservas = [];
+                if (response.ok) {
+                    const data = await response.json();
+                    reservas = data.data || data;
+                }
+
+                if (reservas && reservas.length > 0) {
+                    const reservasHTML = `
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Hóspede</th>
+                                        <th>Quarto</th>
+                                        <th>Check-in</th>
+                                        <th>Check-out</th>
+                                        <th>Valor</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${reservas.map(r => `
+                                        <tr>
+                                            <td><strong>${r.codigo_reserva}</strong></td>
+                                            <td>${r.Hospede?.nome || 'N/A'}</td>
+                                            <td>${r.Quarto?.numero || 'N/A'}</td>
+                                            <td>${new Date(r.data_checkin).toLocaleDateString('pt-BR')}</td>
+                                            <td>${new Date(r.data_checkout).toLocaleDateString('pt-BR')}</td>
+                                            <td>R$ ${parseFloat(r.valor_total).toFixed(2)}</td>
+                                            <td>
+                                                <span class="badge badge-${r.status_reserva}">
+                                                    ${r.status_reserva}
+                                                </span>
+                                            </td>
+                                            <td class="action-buttons">
+                                                <button class="btn btn-primary" onclick="verDetalhesReserva(${r.id})">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                ${r.status_reserva === 'pendente' ? `
+                                                    <button class="btn btn-success" onclick="confirmarReserva(${r.id})">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                ` : ''}
+                                                ${r.status_reserva !== 'cancelada' ? `
+                                                    <button class="btn btn-danger" onclick="cancelarReserva(${r.id})">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                ` : ''}
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    document.getElementById('reservasList').innerHTML = reservasHTML;
+                } else {
+                    document.getElementById('reservasList').innerHTML =
+                        '<p class="empty-state">Nenhuma reserva encontrada</p>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar reservas:', error);
+            }
+        }
+
+        // ========== HÓSPEDES ==========
+        async function loadHospedes() {
+            try {
+                const response = await fetch('/api/hospedes', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                const hospedes = data.data || data;
+
+                if (hospedes && hospedes.length > 0) {
+                    const hospedesHTML = `
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Telefone</th>
+                                        <th>CPF</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${hospedes.map(h => `
+                                        <tr>
+                                            <td><strong>${h.nome}</strong></td>
+                                            <td>${h.email}</td>
+                                            <td>${h.telefone}</td>
+                                            <td>${h.cpf}</td>
+                                            <td>
+                                                <span class="badge badge-${h.status}">
+                                                    ${h.status}
+                                                </span>
+                                            </td>
+                                            <td class="action-buttons">
+                                                <button class="btn btn-success" onclick="finalizarEstadia(${h.id})" title="Finalizar Estadia"><i class="fas fa-door-open"></i> Check-out</button><button class="btn btn-primary" onclick="editarHospede(${h.id})" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                 <button class="btn btn-success" onclick="finalizarEstadia(${h.id})">
+                                            <i class="fas fa-door-open"></i>
+                                        </button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    document.getElementById('hospedesList').innerHTML = hospedesHTML;
+                } else {
+                    document.getElementById('hospedesList').innerHTML =
+                        '<p class="empty-state">Nenhum hóspede cadastrado</p>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar hóspedes:', error);
+            }
+        }
+
+
+        // ========== FUNÇÕES DE AÇÃO ==========
+        function filtrarReservas(filtro) {
+            filtroReservaAtual = filtro;
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            loadReservas(filtro);
+        }
+
+        async function liberarTodosQuartos() {
+            if (!confirm('Tem certeza que deseja liberar TODOS os quartos para disponível?')) return;
+
+            try {
+                const response = await fetch('/api/quartos/liberar-todos', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    alert('✅ Todos os quartos foram liberados!');
+                    loadQuartos();
+                    loadDashboard();
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('❌ Erro ao liberar quartos');
+            }
+        }
+
+        async function confirmarReserva(reservaId) {
+            if (!confirm('Confirmar esta reserva?')) return;
+
+            try {
+                const response = await fetch(`/api/reservas/${reservaId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status_reserva: 'confirmada' })
+                });
+
+                if (response.ok) {
+                    alert('✅ Reserva confirmada!');
+                    loadReservas(filtroReservaAtual);
+                    loadDashboard();
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('❌ Erro ao confirmar reserva');
+            }
+        }
+
+        async function cancelarReserva(reservaId) {
+            if (!confirm('Cancelar esta reserva? O quarto será liberado.')) return;
+
+            try {
+                const response = await fetch(`/api/reservas/${reservaId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    alert('✅ Reserva cancelada!');
+                    loadReservas(filtroReservaAtual);
+                    loadDashboard();
+                    loadQuartos();
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('❌ Erro ao cancelar reserva');
+            }
+        }
+
+        async function verDetalhesReserva(reservaId) {
+            try {
+                const response = await fetch(`/api/reservas/${reservaId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const reserva = await response.json();
+
+                    document.getElementById('reservaDetalhes').innerHTML = `
+    <div style="margin-bottom: 20px;">
+        <h3>Informações da Reserva</h3>
+        <p><strong>Código:</strong> ${reserva.codigo_reserva}</p>
+        <p><strong>Status:</strong> <span class="badge badge-${reserva.status_reserva}">${reserva.status_reserva}</span>
+        </p>
+        <p><strong>Check-in:</strong> ${new Date(reserva.data_checkin).toLocaleDateString('pt-BR')}</p>
+        <p><strong>Check-out:</strong> ${new Date(reserva.data_checkout).toLocaleDateString('pt-BR')}</p>
+        <p><strong>Hóspedes:</strong> ${reserva.numero_hospedes}</p>
+        <p><strong>Valor Total:</strong> R$ ${parseFloat(reserva.valor_total).toFixed(2)}</p>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <h3>Hóspede</h3>
+        <p><strong>Nome:</strong> ${reserva.Hospede?.nome || 'N/A'}</p>
+        <p><strong>Email:</strong> ${reserva.Hospede?.email || 'N/A'}</p>
+        <p><strong>Telefone:</strong> ${reserva.Hospede?.telefone || 'N/A'}</p>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <h3>Quarto</h3>
+        <p><strong>Número:</strong> ${reserva.Quarto?.numero || 'N/A'}</p>
+        <p><strong>Tipo:</strong> ${reserva.Quarto?.tipo || 'N/A'}</p>
+        <p><strong>Preço/noite:</strong> R$ ${reserva.Quarto?.preco_noite || 'N/A'}</p>
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+        ${reserva.status_reserva === 'pendente' ? `
+        <button class="btn btn-success" onclick="confirmarReserva(${reserva.id}); fecharModalReserva();">
+            <i class="fas fa-check"></i> Confirmar Reserva
+        </button>
+        ` : ''}
+        ${reserva.status_reserva !== 'cancelada' ? `
+        <button class="btn btn-danger" onclick="cancelarReserva(${reserva.id}); fecharModalReserva();">
+            <i class="fas fa-times"></i> Cancelar Reserva
+        </button>
+        ` : ''}
+    </div>
+    `;
+
+                    document.getElementById('modalReserva').style.display = 'flex';
+                    document.getElementById('modalReservaTitulo').textContent = `Reserva ${reserva.codigo_reserva}`;
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        // ========== MODAL QUARTO ==========
+        function abrirModalQuarto(quartoId = null) {
+            document.getElementById('modalQuarto').style.display = 'flex';
+            document.getElementById('quartoId').value = quartoId || '';
+            document.getElementById('modalQuartoTitulo').textContent = quartoId ? 'Editar Quarto' : 'Novo Quarto';
+
+            if (quartoId) {
+                // Carregar dados do quarto
+                fetch(`/api/quartos/${quartoId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                    .then(r => r.json())
+                    .then(quarto => {
+                        document.getElementById('numero').value = quarto.numero;
+                        document.getElementById('tipo').value = quarto.tipo;
+                        document.getElementById('preco_noite').value = quarto.preco_noite;
+                        document.getElementById('capacidade').value = quarto.capacidade;
+                        document.getElementById('descricao').value = quarto.descricao || '';
+                        document.getElementById('status').value = quarto.status;
+                    });
+            } else {
+                document.getElementById('formQuarto').reset();
+            }
+        }
+
+        function fecharModalQuarto() {
+            document.getElementById('modalQuarto').style.display = 'none';
+        }
+
+        function fecharModalReserva() {
+            document.getElementById('modalReserva').style.display = 'none';
+        }
+
+        document.getElementById('formQuarto').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const quartoId = document.getElementById('quartoId').value;
+            const url = quartoId ? `/api/quartos/${quartoId}` : '/api/quartos';
+            const method = quartoId ? 'PUT' : 'POST';
+
+            const dados = {
+                numero: document.getElementById('numero').value,
+                tipo: document.getElementById('tipo').value,
+                preco_noite: parseFloat(document.getElementById('preco_noite').value),
+                capacidade: parseInt(document.getElementById('capacidade').value),
+                descricao: document.getElementById('descricao').value,
+                status: document.getElementById('status').value
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dados)
+                });
+
+                if (response.ok) {
+                    alert(quartoId ? '✅ Quarto atualizado!' : '✅ Quarto criado!');
+                    fecharModalQuarto();
+                    loadQuartos();
+                    loadDashboard();
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('❌ Erro ao salvar quarto');
+            }
+        });
+
+        async function editarQuarto(quartoId) {
+            abrirModalQuarto(quartoId);
+        }
+
+        async function excluirQuarto(quartoId) {
+            if (!confirm('Excluir este quarto?')) return;
+
+            try {
+                const response = await fetch(`/api/quartos/${quartoId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    alert('✅ Quarto excluído!');
+                    loadQuartos();
+                    loadDashboard();
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('❌ Erro ao excluir quarto');
+            }
+        }
+
+        // ========== NAVEGAÇÃO ==========
+        function showSection(section) {
+            document.querySelectorAll('section').forEach(s => s.style.display = 'none');
+            document.getElementById(`${section}-section`).style.display = 'block';
+            document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (section === 'dashboard') loadDashboard();
+            if (section === 'quartos') loadQuartos();
+            if (section === 'reservas') {
+                loadReservas('todas');
+                filtroReservaAtual = 'todas';
+            }
+            if (section === 'hospedes') loadHospedes();
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/admin/login.html';
+        }
+
+        // ========== UTILITÁRIOS ==========
+        function getTipoNome(tipo) {
+            const tipos = {
+                'standard': 'Standard',
+                'deluxe': 'Deluxe',
+                'suite': 'Suíte',
+                'familia': 'Família'
+            };
+            return tipos[tipo] || tipo;
+        }
+
+        function getStatusNome(status) {
+            const statusNomes = {
+                'disponivel': 'Disponível',
+                'ocupado': 'Ocupado',
+                'reservado': 'Reservado',
+                'manutencao': 'Manutenção'
+            };
+            return statusNomes[status] || status;
+        }
+
+               // ========== INICIALIZAÇÃO ==========
+        loadDashboard();
+
+        // Fechar modais ao clicar fora
+        window.onclick = function (event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+    
+    <!-- CORRETO: Apenas estas duas linhas -->
+    <script src="js/checkout.js"></script>
+    <script src="js/hospedes.js"></script>
+    
+    <!-- MODAL CHECKOUT -->
+    <div id="modalCheckout" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2 id="modalCheckoutTitulo">Check-out</h2>
+                <button onclick="fecharModalCheckout()"
+                    style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+            <div id="checkoutDetalhes" style="padding: 20px 0;">
+                <!-- Conteúdo do checkout será carregado aqui dinamicamente -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+    <!-- MODAL CHECK-OUT -->
+    <div id="modalCheckout" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2 id="modalCheckoutTitulo">Finalizar Estadia - Check-out</h2>
+                <button onclick="fecharModalCheckout()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+            <div id="checkoutDetalhes">
+                <div style="text-align: center; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i>
+                    <p>Carregando detalhes...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="/admin/checkout.js"></script>

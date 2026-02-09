@@ -1,0 +1,31 @@
+/* Estilos específicos para a página de reservas */
+.reservas-hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('../img/reservas-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 50vh;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+}
+
+/* Estilos da tabela */
+#tabelaReservas {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#tabelaReservas th {
+    font-weight: 600;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .reservas-hero {
+        height: 40vh;
+        text-align: center;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+}

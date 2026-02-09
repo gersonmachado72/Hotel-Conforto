@@ -1,0 +1,326 @@
+// Dados da reserva
+let reservaData = {
+    quarto: null,
+    quarto_info: null,
+    checkin: '',
+    checkout: '',
+    hospedes: 2,
+    total: 0
+};
+
+// Elementos
+let currentStep = 1;
+const totalSteps = 4;
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadQuartosDisponiveis();
+    setupEventListeners();
+    updateResumo();
+});
+
+// Carregar quartos disponíveis
+async function loadQuartosDisponiveis() {
+    const container = document.getElementById('quartos-disponiveis');
+    
+    try {
+        const response = await fetch('/api/quartos/disponiveis');
+        const quartos = await response.json();
+        
+        if (!quartos || quartos.length === 0) {
+            container.innerHTML = `
+                <div class="no-quartos" style="text-align: center; padding: 40px; grid-column: 1/-1;">
+                    <i class="fas fa-bed" style="font-size: 3rem; color: #7f8c8d; margin-bottom: 20px;"></i>
+                    <h3>Nenhum quarto disponível no momento</h3>
+                    <p>Tente selecionar outras datas ou entre em contato conosco.</p>
+                    <button onclick="window.location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <i class="fas fa-sync-alt"></i> Tentar novamente
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = quartos.map(quarto => `
+            <div class="quarto-option" data-quarto-id="${quarto.id}" onclick="selectQuarto(${quarto.id}, '${quarto.numero}', '${quarto.tipo}', ${quarto.preco_noite})">
+                <div class="radio"></div>
+                <h3>Quarto ${quarto.numero} - ${getTipoNome(quarto.tipo)}</h3>
+                <div class="preco">R$ ${parseFloat(quarto.preco_noite).toFixed(2)} /noite</div>
+                <p class="descricao">${quarto.descricao || 'Quarto confortável e bem equipado.'}</p>
+                <div class="comodidades">
+                    <span class="comodidade">${quarto.capacidade} pessoas</span>
+                    ${quarto.comodidades && Array.isArray(quarto.comodidades) 
+                        ? quarto.comodidades.slice(0, 3).map(c => 
+                            `<span class="comodidade">${c}</span>`
+                          ).join('')
+                        : ''
+                    }
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Erro ao carregar quartos:', error);
+        container.innerHTML = '<p class="error">Erro ao carregar quartos disponíveis.</p>';
+    }
+}
+
+// Selecionar quarto
+function selectQuarto(quartoId, quartoNumero, quartoTipo, precoNoite) {
+    // Remover seleção anterior
+    document.querySelectorAll('.quarto-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    // Adicionar seleção atual
+    const selectedOption = document.querySelector(`[data-quarto-id="${quartoId}"]`);
+    if (selectedOption) {
+        selectedOption.classList.add('selected');
+        reservaData.quarto = quartoId;
+        reservaData.quarto_info = `Quarto ${quartoNumero} - ${getTipoNome(quartoTipo)}`;
+        reservaData.preco_noite = precoNoite;
+        updateResumo();
+    }
+}
+
+// Configurar listeners
+function setupEventListeners() {
+    // Datas
+    const checkinInput = document.getElementById('checkin');
+    const checkoutInput = document.getElementById('checkout');
+    const hospedesInput = document.getElementById('hospedes');
+    
+    // Configurar data mínima (amanhã)
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    checkinInput.min = tomorrow.toISOString().split('T')[0];
+    
+    checkinInput.addEventListener('change', function() {
+        if (this.value) {
+            const minCheckout = new Date(this.value);
+            minCheckout.setDate(minCheckout.getDate() + 1);
+            checkoutInput.min = minCheckout.toISOString().split('T')[0];
+            checkoutInput.disabled = false;
+            
+            reservaData.checkin = this.value;
+            updateResumo();
+        }
+    });
+    
+    checkoutInput.addEventListener('change', function() {
+        if (this.value) {
+            reservaData.checkout = this.value;
+            updateResumo();
+        }
+    });
+    
+    hospedesInput.addEventListener('change', function() {
+        reservaData.hospedes = parseInt(this.value);
+        updateResumo();
+    });
+}
+
+// Atualizar resumo
+function updateResumo() {
+    if (reservaData.quarto && reservaData.quarto_info) {
+        document.getElementById('resumo-quarto').textContent = reservaData.quarto_info;
+        
+        if (reservaData.preco_noite) {
+            document.getElementById('resumo-diaria').textContent = 
+                `R$ ${parseFloat(reservaData.preco_noite).toFixed(2)}`;
+            
+            // Calcular total
+            if (reservaData.checkin && reservaData.checkout) {
+                const checkin = new Date(reservaData.checkin);
+                const checkout = new Date(reservaData.checkout);
+                const diffTime = Math.abs(checkout - checkin);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                reservaData.total = diffDays * parseFloat(reservaData.preco_noite);
+                
+                document.getElementById('resumo-total').textContent = 
+                    `R$ ${reservaData.total.toFixed(2)}`;
+            }
+        }
+    }
+}
+
+// Navegação entre steps
+function nextStep() {
+    if (currentStep < totalSteps) {
+        // Validar step atual
+        if (!validateStep(currentStep)) {
+            return;
+        }
+        
+        // Ir para próximo step
+        document.getElementById(`step${currentStep}`).classList.remove('active');
+        currentStep++;
+        document.getElementById(`step${currentStep}`).classList.add('active');
+        
+        // Atualizar dados de confirmação no último step
+        if (currentStep === 4) {
+            updateConfirmacao();
+        }
+    }
+}
+
+function prevStep() {
+    if (currentStep > 1) {
+        document.getElementById(`step${currentStep}`).classList.remove('active');
+        currentStep--;
+        document.getElementById(`step${currentStep}`).classList.add('active');
+    }
+}
+
+// Validar step
+function validateStep(step) {
+    switch(step) {
+        case 1:
+            if (!reservaData.quarto) {
+                alert('Por favor, selecione um quarto.');
+                return false;
+            }
+            break;
+            
+        case 2:
+            const checkin = document.getElementById('checkin').value;
+            const checkout = document.getElementById('checkout').value;
+            
+            if (!checkin || !checkout) {
+                alert('Por favor, selecione as datas de check-in e check-out.');
+                return false;
+            }
+            
+            if (new Date(checkout) <= new Date(checkin)) {
+                alert('A data de check-out deve ser posterior à data de check-in.');
+                return false;
+            }
+            break;
+            
+        case 3:
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const telefone = document.getElementById('telefone').value;
+            const cpf = document.getElementById('cpf').value;
+            
+            if (!nome || !email || !telefone || !cpf) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return false;
+            }
+            
+            if (!isValidEmail(email)) {
+                alert('Por favor, insira um e-mail válido.');
+                return false;
+            }
+            break;
+    }
+    
+    return true;
+}
+
+// Atualizar dados de confirmação
+function updateConfirmacao() {
+    if (reservaData.quarto) {
+        document.getElementById('confirm-quarto').textContent = reservaData.quarto_info;
+        
+        if (reservaData.checkin) {
+            document.getElementById('confirm-checkin').textContent = 
+                new Date(reservaData.checkin).toLocaleDateString('pt-BR');
+        }
+        
+        if (reservaData.checkout) {
+            document.getElementById('confirm-checkout').textContent = 
+                new Date(reservaData.checkout).toLocaleDateString('pt-BR');
+        }
+        
+        document.getElementById('confirm-hospedes').textContent = 
+            `${reservaData.hospedes} pessoa${reservaData.hospedes > 1 ? 's' : ''}`;
+        
+        document.getElementById('confirm-total').textContent = 
+            `R$ ${reservaData.total.toFixed(2)}`;
+    }
+}
+
+// Finalizar reserva
+async function finalizarReserva() {
+    if (!document.getElementById('termos').checked) {
+        alert('Por favor, aceite os termos e condições.');
+        return;
+    }
+    
+    // Coletar dados do formulário
+    const hospedeData = {
+        nome: document.getElementById('nome').value,
+        email: document.getElementById('email').value,
+        telefone: document.getElementById('telefone').value,
+        cpf: document.getElementById('cpf').value.replace(/\D/g, '')
+    };
+    
+    const reservaFinal = {
+        quarto_id: reservaData.quarto,
+        hospede: hospedeData,
+        data_checkin: reservaData.checkin,
+        data_checkout: reservaData.checkout,
+        numero_hospedes: reservaData.hospedes,
+        valor_total: reservaData.total,
+        observacoes: document.getElementById('observacoes').value
+    };
+    
+    console.log('Enviando reserva:', reservaFinal);
+    
+    try {
+        // Criar reserva (a API agora cria o hóspede automaticamente)
+        const reservaResponse = await fetch('/api/reservas', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(reservaFinal)
+        });
+        
+        if (!reservaResponse.ok) {
+            const error = await reservaResponse.json();
+            throw new Error(error.error || 'Erro ao criar reserva');
+        }
+        
+        const reserva = await reservaResponse.json();
+        
+        // Salvar dados no localStorage para a página de confirmação
+        localStorage.setItem('ultima_reserva', JSON.stringify({
+            data_checkin: reservaData.checkin,
+            data_checkout: reservaData.checkout,
+            quarto_info: reservaData.quarto_info,
+            valor_total: reservaData.total
+        }));
+        
+        // Redirecionar para confirmação
+        window.location.href = `/reserva-confirmada.html?codigo=${reserva.codigo_reserva}`;
+        
+    } catch (error) {
+        console.error('Erro ao finalizar reserva:', error);
+        alert('Erro ao processar reserva: ' + error.message);
+    }
+}
+
+// Utilitários
+function getTipoNome(tipo) {
+    const tipos = {
+        'standard': 'Standard',
+        'deluxe': 'Deluxe',
+        'suite': 'Suíte',
+        'familia': 'Família'
+    };
+    return tipos[tipo] || tipo;
+}
+
+function isValidEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+// Adicionar função global para o HTML
+window.selectQuarto = selectQuarto;
+window.nextStep = nextStep;
+window.prevStep = prevStep;
+window.finalizarReserva = finalizarReserva;

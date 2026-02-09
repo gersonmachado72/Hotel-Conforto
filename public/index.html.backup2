@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Conforto - O Melhor Descanso para Você</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header/Navbar -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="/" class="logo">
+                    <i class="fas fa-hotel"></i>
+                    <span>Hotel Conforto</span>
+                </a>
+                
+                <div class="nav-menu">
+                    <a href="/" class="nav-link active">Home</a>
+                    <a href="#quartos" class="nav-link">Quartos</a>
+                    <a href="#servicos" class="nav-link">Serviços</a>
+                    <a href="#sobre" class="nav-link">Sobre</a>
+                    <a href="#contato" class="nav-link">Contato</a>
+                    <a href="/reservas" class="nav-link btn-reserva">Reservar Agora</a>
+                    <a href="/painel" class="nav-link"><i class="fas fa-user"></i> Minha Conta</a>
+                </div>
+                
+                <button class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Bem-vindo ao Hotel Conforto</h1>
+            <p class="hero-subtitle">Experiência única de hospedagem com conforto e elegância</p>
+            <a href="/reservas" class="btn-hero">
+                <i class="fas fa-calendar-check"></i> Fazer Reserva
+            </a>
+        </div>
+        <div class="hero-overlay"></div>
+    </section>
+
+    <!-- Quartos Disponíveis -->
+    <section id="quartos" class="section">
+        <div class="container">
+            <h2 class="section-title">Nossos Quartos</h2>
+            <p class="section-subtitle">Conforto e sofisticação para sua estadia</p>
+            
+            <div class="quartos-grid" id="quartos-container">
+                <!-- Os quartos serão carregados via JavaScript -->
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Carregando quartos...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Serviços -->
+    <section id="servicos" class="section bg-light">
+        <div class="container">
+            <h2 class="section-title">Nossos Serviços</h2>
+            
+            <div class="servicos-grid">
+                <div class="servico-card">
+                    <div class="servico-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h3>Restaurante</h3>
+                    <p>Culinária internacional com chefs renomados</p>
+                </div>
+                
+                <div class="servico-card">
+                    <div class="servico-icon">
+                        <i class="fas fa-swimming-pool"></i>
+                    </div>
+                    <h3>Piscina</h3>
+                    <p>Piscina aquecida com vista panorâmica</p>
+                </div>
+                
+                <div class="servico-card">
+                    <div class="servico-icon">
+                        <i class="fas fa-spa"></i>
+                    </div>
+                    <h3>Spa & Wellness</h3>
+                    <p>Tratamentos relaxantes e massagens</p>
+                </div>
+                
+                <div class="servico-card">
+                    <div class="servico-icon">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <h3>Wi-Fi Grátis</h3>
+                    <p>Internet de alta velocidade em todas as áreas</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sobre -->
+    <section id="sobre" class="section">
+        <div class="container">
+            <div class="sobre-grid">
+                <div class="sobre-content">
+                    <h2 class="section-title">Sobre o Hotel Conforto</h2>
+                    <p>Localizado no coração da cidade, o Hotel Conforto oferece uma experiência única de hospedagem combinando conforto, elegância e serviço personalizado.</p>
+                    <p>Com mais de 20 anos de tradição, somos referência em hospitalidade, atendendo tanto viajantes a negócios quanto famílias em férias.</p>
+                    
+                    <div class="stats">
+                        <div class="stat">
+                            <h3>50+</h3>
+                            <p>Quartos</p>
+                        </div>
+                        <div class="stat">
+                            <h3>15k+</h3>
+                            <p>Hóspedes Satisfeitos</p>
+                        </div>
+                        <div class="stat">
+                            <h3>24/7</h3>
+                            <p>Recepção</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sobre-image">
+                    <img src="/img/hotel-exterior.jpg" alt="Exterior do Hotel">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3><i class="fas fa-hotel"></i> Hotel Conforto</h3>
+                    <p>Rua das Flores, 123 - Centro</p>
+                    <p>São Paulo - SP, 01234-567</p>
+                    <p><i class="fas fa-phone"></i> (11) 9999-8888</p>
+                    <p><i class="fas fa-envelope"></i> contato@hotelconforto.com</p>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Links Rápidos</h3>
+                    <a href="/">Home</a>
+                    <a href="#quartos">Quartos</a>
+                    <a href="#servicos">Serviços</a>
+                    <a href="/reservas">Reservas</a>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Redes Sociais</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-tripadvisor"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Hotel Conforto. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="/js/main.js"></script>
+    <script src="/js/api.js"></script>
+</body>
+</html>

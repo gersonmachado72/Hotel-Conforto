@@ -1,0 +1,264 @@
+const express = require('express');
+const { Op } = require('sequelize');
+const Reserva = require('../models/Reserva');
+const Quarto = require('../models/Quarto');
+const Hospede = require('../models/Hospede');
+const { authenticateToken, isStaff } = require('../middleware/auth');
+
+const router = express.Router();
+
+// Função para gerar código de reserva
+function gerarCodigoReserva() {
+  const prefix = 'RES';
+  const timestamp = Date.now().toString().slice(-6);
+  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+  return `${prefix}${timestamp}${random}`;
+}
+
+// GET /api/reservas - Listar reservas (apenas staff)
+router.get('/', authenticateToken, isStaff, async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      status,
+      data_inicio,
+      data_fim
+    } = req.query;
+
+    const offset = (page - 1) * limit;
+
+    const where = {};
+
+    if (status) {
+      where.status_reserva = status;
+    }
+
+    if (data_inicio && data_fim) {
+      where[Op.or] = [
+        {
+          data_checkin: {
+            [Op.between]: [data_inicio, data_fim]
+          }
+        },
+        {
+          data_checkout: {
+            [Op.between]: [data_inicio, data_fim]
+          }
+        }
+      ];
+    }
+
+    const reservas = await Reserva.findAndCountAll({
+      where,
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['data_checkin', 'DESC']],
+      include: [
+        {
+          model: Quarto,
+          attributes: ['numero', 'tipo', 'preco_noite']
+        },
+        {
+          model: Hospede,
+          attributes: ['nome', 'email', 'telefone']
+        }
+      ]
+    });
+
+    res.json({
+      data: reservas.rows,
+      total: reservas.count,
+      page: parseInt(page),
+      totalPages: Math.ceil(reservas.count / limit)
+    });
+  } catch (error) {
+    console.error('Erro ao buscar reservas:', error);
+    res.status(500).json({ error: 'Erro ao buscar reservas' });
+  }
+});
+
+// GET /api/reservas/minhas - Listar minhas reservas
+router.get('/minhas', authenticateToken, async (req, res) => {
+  try {
+    const user = req.user;
+
+    // Buscar hóspede pelo email do usuário
+    const hospede = await Hospede.findOne({
+      where: { email: user.email }
+    });
+
+    if (!hospede) {
+      return res.json([]);
+    }
+
+    const reservas = await Reserva.findAll({
+      where: { hospede_id: hospede.id },
+      order: [['data_checkin', 'DESC']],
+      include: [
+        {
+          model: Quarto,
+          attributes: ['numero', 'tipo', 'foto_url']
+        }
+      ]
+    });
+
+    res.json(reservas);
+  } catch (error) {
+    console.error('Erro ao buscar minhas reservas:', error);
+    res.status(500).json({ error: 'Erro ao buscar minhas reservas' });
+  }
+});
+
+// GET /api/reservas/:id - Buscar reserva por ID
+router.get('/:id', authenticateToken, isStaff, async (req, res) => {
+  try {
+    const reserva = await Reserva.findByPk(req.params.id, {
+      include: [
+        {
+          model: Quarto,
+          attributes: ['numero', 'tipo', 'preco_noite', 'descricao']
+        },
+        {
+          model: Hospede,
+          attributes: ['nome', 'email', 'telefone', 'cpf']
+        }
+      ]
+    });
+
+    if (!reserva) {
+      return res.status(404).json({ error: 'Reserva não encontrada' });
+    }
+
+    res.json(reserva);
+  } catch (error) {
+    console.error('Erro ao buscar reserva:', error);
+    res.status(500).json({ error: 'Erro ao buscar reserva' });
+  }
+});
+
+// POST /api/reservas - Criar nova reserva
+router.post('/', async (req, res) => {
+  try {
+    console.log('Dados recebidos:', req.body);
+
+    const { quarto_id, hospede_id, ...reservaData } = req.body;
+
+    // Verificar se o quarto existe e está disponível
+    const quarto = await Quarto.findByPk(quarto_id);
+
+    if (!quarto) {
+      return res.status(404).json({ error: 'Quarto não encontrado' });
+    }
+
+    if (quarto.status !== 'disponivel') {
+      return res.status(400).json({ error: 'Quarto não está disponível' });
+    }
+
+    // Verificar se já existe reserva para este quarto nas datas
+    const reservaConflito = await Reserva.findOne({
+      where: {
+        quarto_id,
+        status_reserva: ['confirmada', 'pendente'],
+        [Op.or]: [
+          {
+            data_checkin: {
+              [Op.between]: [reservaData.data_checkin, reservaData.data_checkout]
+            }
+          },
+          {
+            data_checkout: {
+              [Op.between]: [reservaData.data_checkin, reservaData.data_checkout]
+            }
+          }
+        ]
+      }
+    });
+
+    if (reservaConflito) {
+      return res.status(400).json({
+        error: 'Quarto já reservado para estas datas'
+      });
+    }
+
+    // Gerar código único
+    const codigoReserva = gerarCodigoReserva();
+    console.log('Código gerado:', codigoReserva);
+
+    // Criar reserva
+    const reserva = await Reserva.create({
+      ...reservaData,
+      quarto_id,
+      hospede_id,
+      codigo_reserva: codigoReserva,
+      status_reserva: 'pendente'
+    });
+
+    // Atualizar status do quarto
+    await quarto.update({ status: 'reservado' });
+
+    console.log('Reserva criada com sucesso:', reserva.codigo_reserva);
+
+    res.status(201).json(reserva);
+  } catch (error) {
+    console.error('Erro ao criar reserva:', error);
+    res.status(500).json({ error: 'Erro ao criar reserva' });
+  }
+});
+
+// PUT /api/reservas/:id - Atualizar reserva
+router.put('/:id', authenticateToken, isStaff, async (req, res) => {
+  try {
+    const reserva = await Reserva.findByPk(req.params.id);
+
+    if (!reserva) {
+      return res.status(404).json({ error: 'Reserva não encontrada' });
+    }
+
+    await reserva.update(req.body);
+    res.json(reserva);
+  } catch (error) {
+    console.error('Erro ao atualizar reserva:', error);
+    res.status(500).json({ error: 'Erro ao atualizar reserva' });
+  }
+});
+
+// DELETE /api/reservas/:id - Cancelar reserva
+router.delete('/:id', authenticateToken, async (req, res) => {
+  try {
+    const reserva = await Reserva.findByPk(req.params.id);
+
+    if (!reserva) {
+      return res.status(404).json({ error: 'Reserva não encontrada' });
+    }
+
+    // Verificar permissão
+    const user = req.user;
+    const hospede = await Hospede.findOne({ where: { email: user.email } });
+
+    if (user.cargo !== 'admin' && hospede.id !== reserva.hospede_id) {
+      return res.status(403).json({
+        error: 'Você não tem permissão para cancelar esta reserva'
+      });
+    }
+
+    // Atualizar status da reserva
+    await reserva.update({
+      status_reserva: 'cancelada',
+      status_pagamento: 'cancelado'
+    });
+
+    // Liberar quarto
+    const quarto = await Quarto.findByPk(reserva.quarto_id);
+    if (quarto) {
+      await quarto.update({ status: 'disponivel' });
+    }
+
+    res.json({ message: 'Reserva cancelada com sucesso' });
+  } catch (error) {
+    console.error('Erro ao cancelar reserva:', error);
+    res.status(500).json({ error: 'Erro ao cancelar reserva' });
+  }
+});
+
+module.exports = router;

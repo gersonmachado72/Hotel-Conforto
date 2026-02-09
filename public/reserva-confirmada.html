@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva Confirmada - Hotel Conforto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .container { max-width: 600px; width: 100%; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; text-align: center; }
+        .header { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; padding: 40px 20px; }
+        .header i { font-size: 80px; margin-bottom: 20px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .content { padding: 40px; }
+        .confirmation-code { background: #f8f9fa; border-radius: 10px; padding: 20px; margin: 20px 0; border: 2px dashed #3498db; }
+        .code { font-family: 'Courier New', monospace; font-size: 2rem; font-weight: bold; color: #2c3e50; letter-spacing: 5px; }
+        .details { text-align: left; background: #f8f9fa; border-radius: 10px; padding: 20px; margin: 20px 0; }
+        .detail-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e0e0e0; }
+        .detail-item:last-child { border-bottom: none; }
+        .actions { display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap; justify-content: center; }
+        .btn { padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s ease; }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-primary:hover { background: #2980b9; transform: translateY(-3px); }
+        .btn-secondary { background: #f8f9fa; color: #2c3e50; border: 2px solid #e0e0e0; }
+        .btn-secondary:hover { background: #e9ecef; transform: translateY(-3px); }
+        .info-box { background: #fff8e1; border-left: 4px solid #f1c40f; padding: 15px; margin: 20px 0; text-align: left; border-radius: 0 10px 10px 0; }
+        .whatsapp-btn { background: #25D366; color: white; margin-top: 20px; }
+        .whatsapp-btn:hover { background: #1da851; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <i class="fas fa-check-circle"></i>
+            <h1>Reserva Confirmada!</h1>
+            <p>Sua reserva foi realizada com sucesso</p>
+        </div>
+        
+        <div class="content">
+            <p>Obrigado por escolher o Hotel Conforto! Sua reserva foi processada e em breve entraremos em contato para confirmação.</p>
+            
+            <div class="confirmation-code">
+                <p style="color: #7f8c8d; margin-bottom: 10px;">Código da Reserva</p>
+                <div class="code" id="codigoReserva">CARREGANDO...</div>
+            </div>
+            
+            <div class="details" id="reservaDetails">
+                <!-- Detalhes carregados via JavaScript -->
+            </div>
+            
+            <div class="info-box">
+                <h3><i class="fas fa-info-circle"></i> Informações Importantes</h3>
+                <p>• Guarde este código para consultas futuras</p>
+                <p>• Check-in a partir das 14h | Check-out até 12h</p>
+                <p>• Para cancelamentos, entre em contato com 48h de antecedência</p>
+            </div>
+            
+            <div class="actions">
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Página Inicial
+                </a>
+                <a href="/reservas" class="btn btn-secondary">
+                    <i class="fas fa-plus"></i> Nova Reserva
+                </a>
+                <a href="#" id="whatsappBtn" class="btn whatsapp-btn" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Falar no WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pegar código da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const codigo = urlParams.get('codigo');
+        
+        if (codigo && codigo !== 'undefined') {
+            // Mostrar código
+            document.getElementById('codigoReserva').textContent = codigo;
+            
+            // Configurar link do WhatsApp
+            const whatsappBtn = document.getElementById('whatsappBtn');
+            const message = `Olá! Gostaria de informações sobre minha reserva ${codigo} no Hotel Conforto.`;
+            whatsappBtn.href = `https://wa.me/5511999998888?text=${encodeURIComponent(message)}`;
+            
+            // Tentar carregar dados do localStorage
+            const reservaData = JSON.parse(localStorage.getItem('ultima_reserva') || '{}');
+            
+            document.getElementById('reservaDetails').innerHTML = `
+                <h3>Detalhes da Reserva</h3>
+                <div class="detail-item">
+                    <span>Código:</span>
+                    <span><strong>${codigo}</strong></span>
+                </div>
+                <div class="detail-item">
+                    <span>Status:</span>
+                    <span style="color: #27ae60; font-weight: bold;">Pendente de confirmação</span>
+                </div>
+                ${reservaData.data_checkin ? `
+                <div class="detail-item">
+                    <span>Check-in:</span>
+                    <span>${new Date(reservaData.data_checkin).toLocaleDateString('pt-BR')}</span>
+                </div>
+                ` : ''}
+                ${reservaData.data_checkout ? `
+                <div class="detail-item">
+                    <span>Check-out:</span>
+                    <span>${new Date(reservaData.data_checkout).toLocaleDateString('pt-BR')}</span>
+                </div>
+                ` : ''}
+                ${reservaData.quarto_info ? `
+                <div class="detail-item">
+                    <span>Quarto:</span>
+                    <span>${reservaData.quarto_info}</span>
+                </div>
+                ` : ''}
+                ${reservaData.valor_total ? `
+                <div class="detail-item">
+                    <span>Valor Estimado:</span>
+                    <span style="font-weight: bold; color: #2c3e50;">R$ ${parseFloat(reservaData.valor_total).toFixed(2)}</span>
+                </div>
+                ` : ''}
+            `;
+            
+        } else {
+            document.getElementById('codigoReserva').textContent = 'NÃO ENCONTRADO';
+            document.getElementById('reservaDetails').innerHTML = `
+                <p style="color: #e74c3c; text-align: center;">
+                    <i class="fas fa-exclamation-triangle"></i> Código de reserva não encontrado.
+                </p>
+            `;
+        }
+    </script>
+</body>
+</html>
